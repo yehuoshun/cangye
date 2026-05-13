@@ -22,7 +22,7 @@ import (
 	"github.com/yehuoshun/cangye/settings"
 )
 
-//go:embed web/dist/*
+//go:embed frontend/dist/*
 var frontendFS embed.FS
 
 const defaultPort = 27138
@@ -46,18 +46,17 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(corsMiddleware)
 
-	// API routes
-	api := r.PathPrefix("/api").Subrouter()
-	file.RegisterRoutes(api)
-	file.RegisterOverviewRoutes(api)
-	rss.RegisterRoutes(api)
-	checkin.RegisterRoutes(api)
-	settings.RegisterRoutes(api)
+	// API routes on main router (before SPA fallback)
+	file.RegisterRoutes(r)
+	file.RegisterOverviewRoutes(r)
+	rss.RegisterRoutes(r)
+	checkin.RegisterRoutes(r)
+	settings.RegisterRoutes(r)
 
-	// Serve embedded frontend
-	distFS, err := fs.Sub(frontendFS, "web/dist")
+	// Serve embedded frontend (SPA fallback for non-API paths)
+	distFS, err := fs.Sub(frontendFS, "frontend/dist")
 	if err != nil {
-		log.Printf("frontend not embedded, serving API only")
+		log.Printf("frontend not embedded, serving API only: %v", err)
 	} else {
 		spa := spaHandler{staticFS: distFS, indexPath: "index.html"}
 		r.PathPrefix("/").Handler(spa)
