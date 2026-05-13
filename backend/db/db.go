@@ -10,9 +10,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var DB *sql.DB
+var (
+	DB      *sql.DB
+	dbPath  string
+)
 
-func Init(dbPath string) error {
+func Init(path string) error {
+	dbPath = path
 	if dbPath == "" {
 		home, err := os.UserHomeDir()
 		if err != nil {

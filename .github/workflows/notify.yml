@@ -3,12 +3,17 @@ name: Notify
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [opened, closed, reopened]
+  issues:
+    types: [opened, closed, reopened]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: yehuoshun/yehuoshun-notify@main
         with:
-          webhook: https://oapi.dingtalk.com/robot/send?access_token=244923a35a0555fd090e5a979149c5b5a0306022b0beae40fb70d1452b247a94
-          keyword: GitHub
+          webhook: ${{ secrets.DINGTALK_WEBHOOK }}

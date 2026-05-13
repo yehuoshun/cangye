@@ -15,12 +15,19 @@ func RegisterOverviewRoutes(r *mux.Router) {
 func handleOverviewStats(w http.ResponseWriter, r *http.Request) {
 	stats := map[string]int{}
 
-	db.DB.QueryRow("SELECT COUNT(*) FROM collections WHERE parent_id IS NULL").Scan(&stats["root_collections"])
-	db.DB.QueryRow("SELECT COUNT(*) FROM collections WHERE parent_id IS NOT NULL").Scan(&stats["sub_collections"])
-	db.DB.QueryRow("SELECT COUNT(*) FROM collection_paths").Scan(&stats["paths"])
-	db.DB.QueryRow("SELECT COUNT(*) FROM virtual_files").Scan(&stats["virtual_files"])
-	db.DB.QueryRow("SELECT COUNT(*) FROM scan_cache").Scan(&stats["scanned_files"])
-	db.DB.QueryRow("SELECT COUNT(*) FROM tags").Scan(&stats["tags"])
+	var rootCol, subCol, pathCount, vfCount, scCount, tagCount int
+	db.DB.QueryRow("SELECT COUNT(*) FROM collections WHERE parent_id IS NULL").Scan(&rootCol)
+	db.DB.QueryRow("SELECT COUNT(*) FROM collections WHERE parent_id IS NOT NULL").Scan(&subCol)
+	db.DB.QueryRow("SELECT COUNT(*) FROM collection_paths").Scan(&pathCount)
+	db.DB.QueryRow("SELECT COUNT(*) FROM virtual_files").Scan(&vfCount)
+	db.DB.QueryRow("SELECT COUNT(*) FROM scan_cache").Scan(&scCount)
+	db.DB.QueryRow("SELECT COUNT(*) FROM tags").Scan(&tagCount)
+	stats["root_collections"] = rootCol
+	stats["sub_collections"] = subCol
+	stats["paths"] = pathCount
+	stats["virtual_files"] = vfCount
+	stats["scanned_files"] = scCount
+	stats["tags"] = tagCount
 
 	common.JSON(w, 200, map[string]interface{}{"stats": stats})
 }

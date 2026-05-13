@@ -1,10 +1,15 @@
 # Binaries
 backend/cangye.exe
 backend/cangye
+cangye.exe
+cangye
+cangye.bin
 
 # Frontend node_modules
 frontend/node_modules/
 frontend/dist/
+# Copied dist for Go embed
+backend/frontend/
 
 # IDE
 .idea/
